@@ -216,8 +216,8 @@ void solve(const int n, const double alpha, const double dx, const double dt, co
   // You can initialize data on GPU instead by using #pragma omp target enter data map(to: u[0:n*n], u_tmp[0:n*n]) and then removing the map clause here as shown below
   #pragma omp target
   #pragma omp loop collapse(2)
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < n; ++j) {
+  for (int j = 0; j < n; ++j) {
+    for (int i = 0; i < n; ++i) {
 
       // Update the 5-point stencil, using boundary conditions on the edges of the domain.
       // Boundaries are zero because the MMS solution is zero there.
