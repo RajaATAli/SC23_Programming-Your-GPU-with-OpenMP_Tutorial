@@ -7,4 +7,4 @@
 
 cd $SLURM_SUBMIT_DIR
 
-./heat 8000 50
+nsys nvprof ./heat 8000 50

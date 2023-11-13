@@ -1,0 +1,98 @@
+[train06@ip-10-0-0-142 openmp-tutorial]$ make
+nvc -fast -mp=gpu -gpu=cc75 -c pi.c
+make: nvc: Command not found
+make: *** [pi.o] Error 127
+[train06@ip-10-0-0-142 openmp-tutorial]$ gcc -fopenmp -o vadd vadd.c
+[train06@ip-10-0-0-142 openmp-tutorial]$ ./vadd 
+Segmentation fault
+[train06@ip-10-0-0-142 openmp-tutorial]$ cat submit_
+submit_heat      submit_jac_solv  submit_pi        submit_vadd      
+[train06@ip-10-0-0-142 openmp-tutorial]$ cat submit_
+submit_heat      submit_jac_solv  submit_pi        submit_vadd      
+[train06@ip-10-0-0-142 openmp-tutorial]$ cat submit_vadd
+#!/bin/bash
+#SBATCH --partition queue0
+#SBATCH --nodes 1
+#SBATCH --time 00:02:00
+#SBATCH --job-name vadd
+#SBATCH --output vadd-%j.out
+
+cd $SLURM_SUBMIT_DIR
+
+ulimit -s unlimited
+
+./vadd
+[train06@ip-10-0-0-142 openmp-tutorial]$ sbatch vadd
+vadd          vadd-238.out  vadd-309.out  vadd.c        vadd_heap.c   
+[train06@ip-10-0-0-142 openmp-tutorial]$ sbatch submit_vadd 
+Submitted batch job 421
+[train06@ip-10-0-0-142 openmp-tutorial]$ squeue -u $USER
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+[train06@ip-10-0-0-142 openmp-tutorial]$ ls
+heat.c      make.def        mm_utils.c               pi.c       submit_heat      submit_vadd   vadd-309.out  vadd_heap.c
+heat_map.c  Make_def_files  mm_utils.h               README.md  submit_jac_solv  vadd          vadd-421.out
+jac_solv.c  makefile        omp_GPGPU_prog_SC23.pdf  Solutions  submit_pi        vadd-238.out  vadd.c
+[train06@ip-10-0-0-142 openmp-tutorial]$ cat vadd_421.out
+cat: vadd_421.out: No such file or directory
+[train06@ip-10-0-0-142 openmp-tutorial]$ cat vadd-421.out
+ vectors added with 0 errors
+Init time:    0.114s
+Compute time: 0.026s
+Test time:    0.035s
+Total time:   0.175s
+[train06@ip-10-0-0-142 openmp-tutorial]$ echo $OMP_NUM_THREADS
+
+[train06@ip-10-0-0-142 openmp-tutorial]$ echo $OMP_NUM_THREADS
+
+
+
+[train06@ip-10-0-0-142 openmp-tutorial]$ sbatch submit_vadd
+Submitted batch job 2110
+[train06@ip-10-0-0-142 openmp-tutorial]$ squeue -u $USER
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+[train06@ip-10-0-0-142 openmp-tutorial]$ nsys nvprof ./heat_map 8000 100
+WARNING: heat_map and any of its children processes will be profiled.
+
+
+ MMS heat equation
+
+--------------------
+Problem input
+
+ Grid size: 8000 x 8000
+ Cell width: 1.249844E-01
+ Grid length: 1000.000000 x 1000.000000
+
+ Alpha: 1.000000E-01
+
+ Steps: 100
+ Total time: 5.000000E-01
+ Time step: 5.000000E-03
+--------------------
+Stability
+
+ r value: 0.032008
+--------------------
+Results
+
+Error (L2norm): 5.138757E-11
+Solve time (s): 151.986292
+Total time (s): 154.213801
+--------------------
+Generating '/tmp/nsys-report-8a3f.qdstrm'
+[1/7] [========================100%] report1.nsys-rep
+[2/7] [========================100%] report1.sqlite
+[3/7] Executing 'nvtx_sum' stats report
+SKIPPED: /shared/home/train06/openmp-tutorial/report1.sqlite does not contain NV Tools Extension (NVTX) data.
+[4/7] Executing 'cuda_api_sum' stats report
+SKIPPED: /shared/home/train06/openmp-tutorial/report1.sqlite does not contain CUDA trace data.
+[5/7] Executing 'cuda_gpu_kern_sum' stats report
+SKIPPED: /shared/home/train06/openmp-tutorial/report1.sqlite does not contain CUDA kernel data.
+[6/7] Executing 'cuda_gpu_mem_time_sum' stats report
+SKIPPED: /shared/home/train06/openmp-tutorial/report1.sqlite does not contain GPU memory data.
+[7/7] Executing 'cuda_gpu_mem_size_sum' stats report
+SKIPPED: /shared/home/train06/openmp-tutorial/report1.sqlite does not contain GPU memory data.
+Generated:
+    /shared/home/train06/openmp-tutorial/report1.nsys-rep
+    /shared/home/train06/openmp-tutorial/report1.sqlite
+[train06@ip-10-0-0-142 openmp-tutorial]$ 

@@ -129,7 +129,11 @@ int main(int argc, char *argv[]) {
   //
 
   // Start the solve timer
+
+
   double tic = omp_get_wtime();
+  // Initializing Data on GPU from host
+  #pragma omp target enter data map(to: u[0:n*n], u_tmp[0:n*n])
   for (int t = 0; t < nsteps; ++t) {
 
     // Call the solve kernel
@@ -142,6 +146,8 @@ int main(int argc, char *argv[]) {
     u = u_tmp;
     u_tmp = tmp;
   }
+  #pragma omp target exit data map(from: u[0:n*n]) 
+
   // Stop solve timer
   double toc = omp_get_wtime();
 
@@ -204,6 +210,12 @@ void solve(const int n, const double alpha, const double dx, const double dt, co
   const double r2 = 1.0 - 4.0*r;
 
   // Loop over the nxn grid
+
+  // Map clause to handle data transfer from CPU to GPU
+  // #pragma omp target map(tofrom u:[0:n*n], u_tmp:[0:n*n])
+  // You can initialize data on GPU instead by using #pragma omp target enter data map(to: u[0:n*n], u_tmp[0:n*n]) and then removing the map clause here as shown below
+  #pragma omp target
+  #pragma omp loop collapse(2)
   for (int i = 0; i < n; ++i) {
     for (int j = 0; j < n; ++j) {
 
